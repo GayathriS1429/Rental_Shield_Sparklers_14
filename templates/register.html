@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create an account | RentalShield</title>
+  <meta name="description" content="Create a RentalShield account to review rental listings and save reports.">
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --line: #293e56;
+      --text: #f3f7fc;
+      --muted: #a7b8cc;
+      --mint: #65e5c7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(ellipse at 10% 0%, #123149, transparent 40%), var(--bg);
+      color: var(--text);
+      font: 16px/1.6 Inter, system-ui, Arial, sans-serif;
+    }
+
+    a { color: var(--mint); }
+    button, input, select { font: inherit; }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--mint);
+      outline-offset: 3px;
+    }
+
+    .wrap { width: min(1120px, 92%); margin: auto; }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: #07111fee;
+    }
+
+    nav {
+      min-height: 74px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--text);
+      font-weight: 900;
+      font-size: 1.25rem;
+      text-decoration: none;
+    }
+
+    .brand span { color: var(--mint); }
+
+    main {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 40px 0;
+    }
+
+    .layout {
+      width: min(960px, 100%);
+      display: grid;
+      grid-template-columns: .9fr 1.1fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      color: var(--mint);
+      font-size: .75rem;
+      letter-spacing: .16em;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.7rem);
+      line-height: 1.05;
+      letter-spacing: -.05em;
+      margin: 14px 0;
+    }
+
+    .muted { color: var(--muted); }
+
+    .panel {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(145deg, #102238, #0b1929);
+      box-shadow: 0 20px 60px #00000020;
+    }
+
+    .panel h2 { margin-top: 0; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin: 16px 0;
+    }
+
+    label { font-size: .9rem; font-weight: 750; }
+
+    input, select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #3a526a;
+      border-radius: 10px;
+      background: #071522;
+      color: var(--text);
+    }
+
+    .phone {
+      display: grid;
+      grid-template-columns: 145px 1fr;
+      gap: 10px;
+    }
+
+    .hint { font-size: .82rem; color: var(--muted); }
+
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 18px 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .consent input {
+      width: auto;
+      margin-top: 6px;
+      accent-color: var(--mint);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 13px 17px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--mint);
+      color: #06221f;
+      font-weight: 850;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      background: #3d202a;
+      color: #ffd8dd;
+      margin: 12px 0;
+    }
+
+    .good {
+      background: #15372c;
+      color: #d7ffe4;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 25px 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 740px) {
+      .layout { grid-template-columns: 1fr; }
+      main { padding: 28px 0; }
+      .panel { padding: 22px; }
+    }
+
+    @media (max-width: 440px) {
+      .phone { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="wrap">
+      <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+      <a href="{{ url_for('home') }}">← Back to home</a>
+    <a href="{{ url_for('analytics') }}" class="brand">Analytics</a>
+  </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="layout">
+      <section>
+        <div class="eyebrow">Start with clarity</div>
+        <h1>Make your next rental decision with <span style="color: var(--mint)">confidence.</span></h1>
+
+        <p class="muted">
+          Create your account to review rental information, understand potential
+          warning signs and keep your reports organised.
+        </p>
+
+        <p class="muted">
+          Your reports are screening aids. Always verify important claims independently.
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>Create your account</h2>
+        <p class="muted">Fill in the details below to get started.</p>
+
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+          <div class="alert {{ 'good' if category != 'error' else '' }}" role="status">
+            {{ message }}
+          </div>
+        {% endfor %}
+
+        {% if error %}
+          <div class="alert" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('register') }}" id="registerForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="field">
+            <label for="username">Username *</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              minlength="3"
+              maxlength="40"
+              pattern="[A-Za-z0-9_]+"
+              autocomplete="username"
+              placeholder="Choose a username"
+              value="{{ request.form.get('username', '') }}"
+              required
+            >
+            <span class="hint">Use 3–40 letters, numbers or underscores.</span>
+          </div>
+
+          <div class="field">
+            <label for="email">Email address *</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              maxlength="254"
+              autocomplete="email"
+              placeholder="you@example.com"
+              value="{{ request.form.get('email', '') }}"
+              required
+            >
+          </div>
+
+          <div class="field">
+            <label for="phone_number">Phone number (optional)</label>
+
+            <div class="phone">
+              <select id="phone_country_code" name="phone_country_code" aria-label="Country calling code">
+                <option value="+1">Canada / US (+1)</option>
+                <option value="+91">India (+91)</option>
+                <option value="+44">UK (+44)</option>
+                <option value="+61">Australia (+61)</option>
+                <option value="+971">UAE (+971)</option>
+                <option value="+65">Singapore (+65)</option>
+                <option value="+64">New Zealand (+64)</option>
+                <option value="+49">Germany (+49)</option>
+                <option value="+33">France (+33)</option>
+                <option value="+81">Japan (+81)</option>
+              </select>
+
+              <input
+                id="phone_number"
+                name="phone_number"
+                type="tel"
+                maxlength="20"
+                autocomplete="tel-national"
+                placeholder="Your phone number"
+              >
+            </div>
+
+            <span class="hint">
+              Optional. Phone details will only be saved if the backend supports them.
+            </span>
+          </div>
+
+          <div class="field">
+            <label for="password">Password *</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              minlength="8"
+              maxlength="128"
+              autocomplete="new-password"
+              placeholder="Create a strong password"
+              required
+            >
+            <span class="hint">Use at least 8 characters.</span>
+          </div>
+
+          <div class="field">
+            <label for="confirm_password">Confirm password *</label>
+            <input
+              id="confirm_password"
+              name="confirm_password"
+              type="password"
+              minlength="8"
+              maxlength="128"
+              autocomplete="new-password"
+              placeholder="Enter your password again"
+              required
+            >
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" id="terms" name="terms" value="accepted" required>
+            <span>
+              I understand that RentalShield provides preliminary screening information
+              and does not guarantee that a rental listing is legitimate or safe.
+            </span>
+          </label>
+
+          <button class="btn" type="submit">Create my account →</button>
+        </form>
+
+        <p class="hint">
+          Already have an account?
+          <a href="{{ url_for('login') }}">Sign in</a>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+      <p>Preliminary rental screening, not a legal or safety guarantee.</p>
+      © RentalShield
+    </div>
+  </footer>
+
+  <script>
+    const registerForm = document.getElementById("registerForm");
+
+    registerForm.addEventListener("submit", function (event) {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm_password").value;
+
+      if (!/^[A-Za-z0-9_]{3,40}$/.test(username)) {
+        event.preventDefault();
+        alert("Username must contain 3–40 letters, numbers or underscores.");
+        return;
+      }
+
+      if (password.length < 8) {
+        event.preventDefault();
+        alert("Your password must contain at least 8 characters.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        event.preventDefault();
+        alert("Passwords do not match. Please try again.");
+      }
+    });
+  </script>
+</body>
+</html>

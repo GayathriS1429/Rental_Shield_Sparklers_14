@@ -1,0 +1,68 @@
+{
+  "generated_at_utc": "2026-10-11T06:17:59.033851+00:00",
+  "source_crime_file": "crimedata_csv_AllNeighbourhoods_AllYears.csv",
+  "source_address_file": "vancouver_property_addresses.csv",
+  "radius_meters": 500,
+  "coordinate_system": "EPSG:26910 (UTM Zone 10N, NAD83)",
+  "address_reference_points": 99742,
+  "neighbourhoods": [
+    "Arbutus Ridge",
+    "Downtown",
+    "Dunbar-Southlands",
+    "Fairview",
+    "Grandview-Woodland",
+    "Hastings-Sunrise",
+    "Kensington-Cedar Cottage",
+    "Kerrisdale",
+    "Killarney",
+    "Kitsilano",
+    "Marpole",
+    "Mount Pleasant",
+    "Oakridge",
+    "Renfrew-Collingwood",
+    "Riley Park",
+    "Shaughnessy",
+    "South Cambie",
+    "Strathcona",
+    "Sunset",
+    "Unknown",
+    "Victoria-Fraserview",
+    "West End",
+    "West Point Grey"
+  ],
+  "years": {
+    "2023": {
+      "incident_records_with_coordinates": 36707,
+      "reference_points_scored": 99742,
+      "median_incident_count": 96.0,
+      "p33_incident_count": 74.0,
+      "p67_incident_count": 131.0,
+      "output_file": "crime_reference_counts_500m_2023.csv"
+    },
+    "2024": {
+      "incident_records_with_coordinates": 33746,
+      "reference_points_scored": 99742,
+      "median_incident_count": 85.0,
+      "p33_incident_count": 66.0,
+      "p67_incident_count": 115.0,
+      "output_file": "crime_reference_counts_500m_2024.csv"
+    },
+    "2025": {
+      "incident_records_with_coordinates": 32533,
+      "reference_points_scored": 99742,
+      "median_incident_count": 87.0,
+      "p33_incident_count": 65.0,
+      "p67_incident_count": 120.0,
+      "output_file": "crime_reference_counts_500m_2025.csv"
+    },
+    "2026": {
+      "incident_records_with_coordinates": 25093,
+      "reference_points_scored": 99742,
+      "median_incident_count": 68.0,
+      "p33_incident_count": 50.0,
+      "p67_incident_count": 99.0,
+      "output_file": "crime_reference_counts_500m_2026.csv"
+    }
+  },
+  "interpretation": "Counts around City property-address points are a relative incident-activity baseline, not a population-adjusted crime rate or official safety rating."
+}

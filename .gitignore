@@ -2,3 +2,6 @@ rental_venv/
 __pycache__/
 *.pyc
 .env
+instance/
+# Local backup files
+*.bak

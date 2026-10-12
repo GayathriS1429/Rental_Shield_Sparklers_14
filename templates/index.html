@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RentalShield — Rent with confidence</title>
+    <meta name="description" content="Check Vancouver rental listings with public data, market context, and practical warning signs before you pay.">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+    <style>
+        :root {
+            --bg: #07111f;
+            --panel: #102238;
+            --line: #293e56;
+            --text: #f3f7fc;
+            --muted: #a7b8cc;
+            --mint: #65e5c7;
+            --amber: #ffd18b;
+            --red: #ff9ca6;
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            background: radial-gradient(ellipse at 10% 0%, #123149, transparent 40%), var(--bg);
+            color: var(--text);
+            font: 16px/1.6 Inter, system-ui, Arial, sans-serif;
+        }
+
+        a { color: var(--mint); }
+
+        button, input, select, textarea { font: inherit; }
+
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible {
+            outline: 3px solid var(--mint);
+            outline-offset: 3px;
+        }
+
+        .wrap { width: min(1120px, 92%); margin: auto; }
+
+        .top {
+            border-bottom: 1px solid var(--line);
+            background: #07111fee;
+        }
+
+        .nav {
+            min-height: 74px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-weight: 900;
+            font-size: 1.25rem;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .brand span { color: var(--mint); }
+
+        .links {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .links a { text-decoration: none; }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 17px;
+            border: 0;
+            border-radius: 11px;
+            background: var(--mint);
+            color: #06221f;
+            font-weight: 850;
+            text-decoration: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .ghost {
+            background: #14273b;
+            color: var(--text);
+            border: 1px solid var(--line);
+        }
+
+        .eyebrow {
+            color: var(--mint);
+            font-size: .75rem;
+            letter-spacing: .16em;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .muted { color: var(--muted); }
+
+        .card, .panel, .result {
+            padding: 24px;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            background: linear-gradient(145deg, #102238, #0b1929);
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            background: #3d202a;
+            color: #ffd8dd;
+            margin: 12px 0;
+        }
+
+        .good {
+            background: #15372c;
+            color: #d7ffe4;
+        }
+
+        .notice {
+            margin: 18px 0;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #685532;
+            background: #2b271d;
+            color: #ffe5b7;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 0;
+        }
+
+        label {
+            font-size: .9rem;
+            font-weight: 750;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #3a526a;
+            border-radius: 10px;
+            background: #071522;
+            color: var(--text);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #8295aa;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .hint {
+            font-size: .82rem;
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .full { grid-column: 1 / -1; }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .fetch-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .fetch-row input { flex: 1; min-width: 0; }
+
+        .fetch-status {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #0b1929;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .fetch-status:empty { display: none; }
+
+        .fetch-status.success {
+            border-color: #27664f;
+            color: #d7ffe4;
+            background: #15372c;
+        }
+
+        .fetch-status.error {
+            border-color: #80414a;
+            color: #ffd8dd;
+            background: #3d202a;
+        }
+
+        .fetch-status.warning {
+            border-color: #685532;
+            color: #ffe5b7;
+            background: #2b271d;
+        }
+
+        .hero {
+            padding: 72px 0 48px;
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 34px;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: clamp(2.6rem, 6vw, 5rem);
+            line-height: 1.03;
+            letter-spacing: -.06em;
+            margin: 14px 0 20px;
+        }
+
+        h1 em { color: var(--mint); font-style: normal; }
+
+        .lead { font-size: 1.1rem; color: var(--muted); }
+
+        .preview {
+            padding: 25px;
+            border: 1px solid #35516c;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #142a40, #0d1b2c);
+        }
+
+        .signal {
+            padding: 14px 0;
+            border-bottom: 1px solid #ffffff14;
+        }
+
+        .signal:last-child { border: 0; }
+
+        .signal strong { display: block; }
+
+        .signal small { color: var(--muted); }
+
+        .section { padding: 45px 0; }
+
+        .section-head { margin-bottom: 22px; }
+
+        .section-head h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            line-height: 1.1;
+            letter-spacing: -.04em;
+            margin: 8px 0;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--line);
+            padding: 28px 0 38px;
+            color: var(--muted);
+            font-size: .88rem;
+        }
+
+        @media (max-width: 780px) {
+            .hero, .grid, .steps { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+            .hero { padding-top: 42px; }
+            .nav { padding: 12px 0; }
+        }
+
+        @media (max-width: 520px) {
+            .fetch-row { flex-direction: column; }
+            .fetch-row .btn { width: 100%; }
+            .card, .panel, .result, .preview { padding: 18px; }
+        }
+
+
+        /* Homepage story flow: impact, two focused maps, then renter voices */
+        .impact-first { border-top: 0; padding-top: 38px; }
+        .focus-map-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+        .focus-map-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(145deg, #102238, #0b1929); padding: 12px; }
+        .focus-map-heading { display: flex; align-items: center; gap: 10px; padding: 8px 8px 12px; }
+        .focus-map-heading h3 { margin: 0; font-size: 1.12rem; }
+        .area-swatch { display: inline-block; width: 11px; height: 11px; flex: 0 0 11px; border-radius: 50%; }
+        .downtown-swatch { background: #65e5c7; box-shadow: 0 0 0 4px #65e5c71c; }
+        .westend-swatch { background: #ffd18b; box-shadow: 0 0 0 4px #ffd18b1c; }
+        .focus-map { height: 310px; width: 100%; border-radius: 13px; background: #0b1927; }
+        .global-map-note { margin: 12px 4px 0; }
+        @media (max-width: 650px) { .focus-map-grid { grid-template-columns: 1fr; } .focus-map { height: 290px; } }
+
+        /* Homepage impact-story sections */
+        .story-section { padding: 58px 0; border-top: 1px solid var(--line); }
+        .story-head { max-width: 760px; margin-bottom: 26px; }
+        .story-head h2 { font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -.04em; margin: 9px 0 14px; }
+        .story-head p { color: var(--muted); max-width: 720px; }
+        .map-layout { display: grid; grid-template-columns: .78fr 1.22fr; gap: 22px; align-items: stretch; }
+        .map-copy, .map-panel, .impact-panel, .community-card, .benefit-card { border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(145deg, #102238, #0b1929); }
+        .map-copy { padding: clamp(22px, 3vw, 34px); display: flex; flex-direction: column; justify-content: center; }
+        .map-copy h3 { font-size: 1.45rem; margin: 10px 0; }
+        .map-copy p { color: var(--muted); }
+        .area-pills { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+        .area-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 11px; border-radius: 999px; background: #0a1927; border: 1px solid var(--line); color: var(--text); font-size: .88rem; }
+        .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+        .dot-mint { background: var(--mint); } .dot-amber { background: var(--amber); }
+        .map-panel { padding: 10px; overflow: hidden; min-width: 0; }
+        .map-footnote { font-size: .8rem; color: var(--muted); padding: 8px 7px 2px; }
+        .impact-layout { display: grid; grid-template-columns: .85fr 1.15fr; gap: 24px; align-items: center; }
+        .impact-panel { padding: clamp(22px, 3vw, 34px); display: grid; place-items: center; text-align: center; }
+        .impact-ring { width: min(270px, 70vw); aspect-ratio: 1; position: relative; display: grid; place-items: center; margin: 4px auto 14px; }
+        .impact-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+        .impact-ring circle { fill: none; stroke-width: 10; }
+        .impact-track { stroke: #263b51; }
+        .impact-progress { stroke: var(--mint); stroke-linecap: round; stroke-dasharray: 565.49; stroke-dashoffset: 565.49; filter: drop-shadow(0 0 8px #65e5c744); }
+        .impact-ring.is-visible .impact-progress { animation: ring-fill 1.8s cubic-bezier(.2,.7,.2,1) forwards; }
+        .impact-value { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .impact-value strong { font-size: clamp(1.6rem, 3.4vw, 2.75rem); line-height: 1; letter-spacing: -.045em; color: var(--text); white-space: nowrap; }
+        .impact-value span { margin-top: 10px; color: var(--muted); font-size: .82rem; }
+        @keyframes ring-fill { to { stroke-dashoffset: 0; } }
+        .impact-copy h2 { font-size: clamp(2rem, 4.2vw, 3.4rem); line-height: 1.06; letter-spacing: -.05em; margin: 10px 0 18px; }
+        .impact-copy p { color: var(--muted); }
+        .impact-note { border-left: 3px solid var(--amber); padding: 13px 16px; background: #2b271d66; border-radius: 0 12px 12px 0; color: #ffe5b7 !important; font-size: .9rem; }
+        .source-link { color: var(--mint); text-decoration: none; border-bottom: 1px solid #65e5c766; }
+        .source-link:hover { border-bottom-color: var(--mint); }
+        .community-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 15px; }
+        .community-card { padding: 22px; display: flex; flex-direction: column; min-width: 0; }
+        .community-card .quote-mark { font-size: 2.4rem; color: var(--mint); line-height: 1; }
+        .community-card h3 { margin: 12px 0 8px; }
+        .community-card p { color: var(--muted); }
+        .community-card .community-link { margin-top: auto; padding-top: 8px; color: var(--mint); text-decoration: none; font-weight: 700; }
+        .community-tag { color: var(--amber); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 800; }
+        .benefit-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; }
+        .benefit-card { padding: 22px; }
+        .benefit-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; background: #65e5c71a; color: var(--mint); font-size: 1.3rem; }
+        .benefit-card h3 { margin: 15px 0 7px; }
+        .benefit-card p { color: var(--muted); margin-bottom: 0; }
+        .home-cta { padding: clamp(26px, 5vw, 48px); border: 1px solid #65e5c755; border-radius: 24px; background: radial-gradient(ellipse at 100% 0%, #65e5c71c, transparent 45%), linear-gradient(145deg, #102b3c, #0b1929); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+        .home-cta h2 { margin: 8px 0 10px; font-size: clamp(1.8rem, 4vw, 2.7rem); line-height: 1.08; }
+        .home-cta p { color: var(--muted); max-width: 650px; margin-bottom: 0; }
+        .home-cta .actions { margin-top: 0; }
+        .disclaimer-line { color: var(--muted); font-size: .82rem; margin-top: 16px; }
+        @media (max-width: 900px) {
+            .map-layout, .impact-layout { grid-template-columns: 1fr; }
+            .community-grid { grid-template-columns: 1fr 1fr; }
+            .benefit-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 560px) {
+            .community-grid, .benefit-grid { grid-template-columns: 1fr; }
+            .story-section { padding: 42px 0; }
+            .home-cta { align-items: flex-start; }
+        }
+
+    </style>
+</head>
+
+<body>
+<header class="top">
+    <nav class="wrap nav">
+        <a class="brand" href="{{ url_for('home') }}">
+            ◈ Rental<span>Shield</span>
+        </a>
+
+        <div class="links">
+            <a href="#how">How it works</a>
+            <a href="#check">Check a listing</a>
+
+    
+            <a href="{{ url_for('analytics') }}">Analytics</a>
+
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}">Dashboard</a>
+
+                <form method="post" action="{{ url_for('logout') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn ghost" type="submit">Sign out</button>
+                </form>
+            {% else %}
+                <a href="{{ url_for('login') }}">Sign in</a>
+                <a class="btn" href="{{ url_for('register') }}">Create account ↗</a>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+
+<main class="wrap">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert {{ 'good' if category != 'error' else '' }}" role="status">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% if error %}
+        <div class="alert" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <!-- Rental-scam loss figure reported by liv.rent, attributed there to CAFC (2024). -->
+    <section class="story-section impact-first" id="fraud-impact">
+        <div class="impact-layout">
+            <div class="impact-panel">
+                <div class="eyebrow">Rental scam losses · 2024</div>
+                <div class="impact-ring" id="impactRing" role="img" aria-label="940,417 Canadian dollars plus in rental scam losses, as reported by liv.rent citing CAFC for 2024">
+                    <svg viewBox="0 0 200 200" aria-hidden="true">
+                        <circle class="impact-track" cx="100" cy="100" r="90"></circle>
+                        <circle class="impact-progress" cx="100" cy="100" r="90"></circle>
+                    </svg>
+                    <div class="impact-value">
+                        <strong>$940,417+</strong>
+                        <span>CAD · reported figure</span>
+                    </div>
+                </div>
+                <p class="hint">Reported rental-scam losses in Canada during 2024.</p>
+            </div>
+            <div class="impact-copy">
+                <div class="eyebrow">Before you send money</div>
+                <h2>Pause before you pay.</h2>
+                <p>Rental scammers may ask for a deposit before you have viewed the property or verified who is offering it. Check the address, arrange a viewing, and review the agreement before paying.</p>
+                <p class="hint"><strong>Source:</strong> <a class="source-link" href="https://renters.liv.rent/verified/" target="_blank" rel="noopener noreferrer">liv.rent — rental scam statistics (attributed to CAFC, 2024)</a>.</p>
+                <p class="hint">The figure is reported by liv.rent and attributed there to CAFC (2024); the linked page is the source for the displayed amount.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- RentalShield's current Vancouver pilot areas -->
+    <section class="story-section" id="vancouver-focus">
+        <div class="story-head">
+            <div class="eyebrow">Current pilot area</div>
+            <h2>Where we currently focus</h2>
+            <p>RentalShield currently focuses on two Vancouver neighbourhoods.</p>
+        </div>
+        <div class="focus-map-grid">
+            <article class="focus-map-card">
+                <div class="focus-map-heading">
+                    <span class="area-swatch downtown-swatch"></span>
+                    <h3>Downtown Vancouver</h3>
+                </div>
+                <div id="downtownFocusMap" class="focus-map" role="region" aria-label="Map highlighting the Downtown Vancouver pilot area"></div>
+            </article>
+            <article class="focus-map-card">
+                <div class="focus-map-heading">
+                    <span class="area-swatch westend-swatch"></span>
+                    <h3>West End</h3>
+                </div>
+                <div id="westEndFocusMap" class="focus-map" role="region" aria-label="Map highlighting the West End pilot area"></div>
+            </article>
+        </div>
+        <p class="map-footnote global-map-note">Neighbourhood highlights are illustrative, not official boundary maps. Map data © OpenStreetMap contributors · Map tiles © CARTO.</p>
+    </section>
+
+    <!-- Public forum examples: link to original posts; not independently verified case records. -->
+    <section class="story-section" id="renter-voices">
+        <div class="story-head">
+            <div class="eyebrow">Reddit · Public discussions</div>
+            <h2>Hear what renters experienced</h2>
+            <p>Examples of rental-scam concerns shared by community members.</p>
+        </div>
+        <div class="community-grid">
+            <article class="community-card">
+                <span class="community-tag">Vancouver housing community</span>
+                <span class="quote-mark" aria-hidden="true">“</span>
+                <h3>When a listing looks convincing</h3>
+                <p class="about-quote">“this person genuinely had me fooled”</p>
+                <p>A reminder to verify the advertiser and viewing process.</p>
+                <a class="community-link" href="https://www.reddit.com/r/vancouverhousing/comments/1qdcedu/scam_warning/" target="_blank" rel="noopener noreferrer">Read the original discussion ↗</a>
+            </article>
+            <article class="community-card">
+                <span class="community-tag">Personal finance community</span>
+                <span class="quote-mark" aria-hidden="true">“</span>
+                <h3>A reported $3,300 loss</h3>
+                <p>A Reddit user described a $3,300 loss in a scam-related post.</p>
+                <p>Check payment requests independently before sending money.</p>
+                <a class="community-link" href="https://www.reddit.com/r/PersonalFinanceCanada/comments/1az9ppk/" target="_blank" rel="noopener noreferrer">Read the original discussion ↗</a>
+            </article>
+            <article class="community-card">
+                <span class="community-tag">Vancouver housing community</span>
+                <span class="quote-mark" aria-hidden="true">“</span>
+                <h3>Deposit before viewing</h3>
+                <p>A discussion raised concerns about a deposit requested before a viewing.</p>
+                <p>Verify the listing and viewing arrangements before paying.</p>
+                <a class="community-link" href="https://www.reddit.com/r/vancouverhousing/comments/1l6xghp/" target="_blank" rel="noopener noreferrer">Read the original discussion ↗</a>
+            </article>
+        </div>
+        <p class="disclaimer-line">These are user-generated posts, not independently verified cases or proof that a particular listing is fraudulent.</p>
+    </section>
+
+    <section class="story-section" id="start-checking">
+        <div class="home-cta">
+            <div>
+                <div class="eyebrow">Your next step</div>
+                <h2>Found a listing? Check it before you pay.</h2>
+                <p>Review available public records and listing details. Treat results as prompts for verification—not proof of fraud or safety.</p>
+            </div>
+            <div class="actions">
+                <a class="btn" href="#check">Check a listing →</a>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section" id="how">
+        <div class="section-head">
+            <div class="eyebrow">Simple by design</div>
+            <h2>More clarity before you commit.</h2>
+
+            <p class="muted">
+                Enter details, review the findings, and keep a report to return to later.
+            </p>
+        </div>
+
+        <div class="steps">
+            <article class="card">
+                <span class="eyebrow">STEP 01</span>
+                <h3>Fetch listing details</h3>
+
+                <p class="muted">
+                    Paste a public rental listing URL and let RentalShield
+                    try to extract its visible text.
+                </p>
+            </article>
+
+            <article class="card">
+                <span class="eyebrow">STEP 02</span>
+                <h3>Review the signals</h3>
+
+                <p class="muted">
+                    Check the address, rent, bedroom count and listing description
+                    before running the screening.
+                </p>
+            </article>
+
+            <article class="card">
+                <span class="eyebrow">STEP 03</span>
+                <h3>Keep your report</h3>
+
+                <p class="muted">
+                    Save the result and revisit your verification history
+                    from your dashboard.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="section" id="check">
+        <div class="section-head">
+            <div class="eyebrow">Rental screening</div>
+            <h2>Let’s check the details.</h2>
+            <p class="muted">Fields marked * are required.</p>
+        </div>
+
+        {% if current_user.is_authenticated %}
+            <form
+                class="panel"
+                id="rental-check-form"
+                action="{{ url_for('verify') }}"
+                method="post"
+            >
+                <input
+                    type="hidden"
+                    id="csrf_token"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <div class="grid">
+                    <div class="field full">
+                        <label for="listing_url">Rental listing URL</label>
+
+                        <div class="fetch-row">
+                            <input
+                                type="url"
+                                id="listing_url"
+                                name="listing_url"
+                                maxlength="2048"
+                                placeholder="https://example.com/rental-listing"
+                                autocomplete="url"
+                            >
+
+                            <button
+                                class="btn"
+                                type="button"
+                                id="fetch-listing-button"
+                            >
+                                Fetch Listing Details
+                            </button>
+                        </div>
+
+                        <span class="hint">
+                            Paste a public listing link. RentalShield will try
+                            to read the page and suggest rent and bedroom details.
+                        </span>
+
+                        <div
+                            id="fetch-status"
+                            class="fetch-status"
+                            role="status"
+                            aria-live="polite"
+                        ></div>
+                    </div>
+
+                    <div class="field">
+                        <label for="civic_number">Street number *</label>
+
+                        <input
+                            id="civic_number"
+                            name="civic_number"
+                            maxlength="20"
+                            placeholder="e.g. 500"
+                            required
+                        >
+
+                        <span class="hint">
+                            Enter the number from the listing address.
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label for="street">Street name *</label>
+
+                        <input
+                            id="street"
+                            name="street"
+                            maxlength="200"
+                            placeholder="e.g. Granville Street"
+                            required
+                        >
+                    </div>
+
+                    <div class="field">
+                        <label for="area">Neighbourhood</label>
+
+                        <select id="area" name="area">
+                            <option value="">Choose neighbourhood</option>
+                            <option value="downtown">Downtown</option>
+                            <option value="west end">West End</option>
+                        </select>
+
+                        <span class="hint">
+                            Choose an area if it applies to your listing.
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label for="monthly_rent">Monthly rent (CAD)</label>
+
+                        <input
+                            id="monthly_rent"
+                            name="monthly_rent"
+                            type="number"
+                            min="1"
+                            max="100000"
+                            step="0.01"
+                            placeholder="e.g. 2500"
+                        >
+
+                        <span class="hint">
+                            The rent you enter is compared with the Vancouver CMA benchmark
+                            and reused as your target monthly amount when RentalShield suggests
+                            alternative neighbourhoods. Suggested areas are not confirmed available rentals.
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label for="bedrooms">Bedrooms</label>
+
+                        <select id="bedrooms" name="bedrooms">
+                            <option value="">Choose count</option>
+                            <option value="1">1 bedroom</option>
+                            <option value="2">2 bedrooms</option>
+                            <option value="3">3+ bedrooms</option>
+                        </select>
+                    </div>
+
+                    <div class="field full">
+                        <label for="description">Listing description</label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            maxlength="15000"
+                            placeholder="Fetch the listing details above, or paste the listing description here."
+                        ></textarea>
+
+                        <span class="hint">
+                            If you manually enter a description, RentalShield
+                            uses it for language analysis instead of replacing
+                            it with the extracted page text.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="notice">
+                    <strong>Important:</strong>
+                    Automatic extraction is best-effort. Rent and bedroom
+                    suggestions may be incomplete or incorrect. Review them
+                    and enter the address manually. A successful extraction
+                    does not establish that a listing is genuine.
+                </div>
+
+                <div class="actions">
+                    <button class="btn" type="submit">
+                        Run Rental Checks →
+                    </button>
+
+                    <a class="btn ghost" href="{{ url_for('dashboard') }}">
+                        View My Reports
+                    </a>
+                </div>
+            </form>
+
+        {% else %}
+            <div class="panel">
+                <h3>Your rental check starts here.</h3>
+
+                <p class="muted">
+                    Create an account or sign in to fetch listing details,
+                    run checks and save reports to your dashboard.
+                </p>
+
+                <div class="actions">
+                    <a class="btn" href="{{ url_for('register') }}">
+                        Create an account →
+                    </a>
+
+                    <a class="btn ghost" href="{{ url_for('login') }}">
+                        I have an account
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+</main>
+
+<footer>
+    <div class="wrap">
+        <a class="brand" href="{{ url_for('home') }}">
+            ◈ Rental<span>Shield</span>
+        </a>
+
+        <p>
+            Preliminary screening, not a legal or safety guarantee.
+            Verify important claims independently before paying money
+            or signing a lease.
+        </p>
+
+        © RentalShield
+    </div>
+</footer>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(() => {
+    "use strict";
+    const ring = document.getElementById("impactRing");
+    if (ring) {
+        const animateRing = () => ring.classList.add("is-visible");
+        if ("IntersectionObserver" in window) {
+            const observer = new IntersectionObserver((entries) => {
+                if (entries.some(entry => entry.isIntersecting)) {
+                    animateRing();
+                    observer.disconnect();
+                }
+            }, { threshold: 0.35 });
+            observer.observe(ring);
+        } else {
+            animateRing();
+        }
+    }
+
+    const initializedMaps = new Set();
+    function initializeAreaMap(elementId, center, zoom, polygonCoordinates, color, popupText) {
+        const element = document.getElementById(elementId);
+        if (!element || initializedMaps.has(elementId)) return;
+        if (typeof L === "undefined") {
+            element.innerHTML = '<div style="padding:20px;color:#edf5ff">Map unavailable. Check your internet connection.</div>';
+            return;
+        }
+        initializedMaps.add(elementId);
+        const map = L.map(element, { scrollWheelZoom: false, zoomControl: true }).setView(center, zoom);
+        L.tileLayer(
+            "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key={{ carto_basemap_api_key|urlencode }}", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: "abcd",
+            maxZoom: 19
+        }).addTo(map);
+        const area = L.polygon(polygonCoordinates, {
+            color, weight: 2, fillColor: color, fillOpacity: 0.28
+        }).addTo(map).bindPopup(popupText);
+        area.bindTooltip(popupText, { sticky: true });
+        L.control.scale({ imperial: false }).addTo(map);
+        map.fitBounds(area.getBounds().pad(0.18));
+        setTimeout(() => map.invalidateSize(), 150);
+    }
+
+    function initializeFocusMaps() {
+        initializeAreaMap(
+            "downtownFocusMap",
+            [49.2820, -123.1170], 14,
+            [[49.2760, -123.1220], [49.2760, -123.1050], [49.2915, -123.1050], [49.2915, -123.1220]],
+            "#65e5c7", "Downtown Vancouver · illustrative focus area"
+        );
+        initializeAreaMap(
+            "westEndFocusMap",
+            [49.2870, -123.1350], 14,
+            [[49.2820, -123.1450], [49.2820, -123.1225], [49.2950, -123.1225], [49.2950, -123.1450]],
+            "#ffd18b", "West End · illustrative focus area"
+        );
+    }
+
+    if ("IntersectionObserver" in window) {
+        const mapObserver = new IntersectionObserver((entries) => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                initializeFocusMaps();
+                mapObserver.disconnect();
+            }
+        }, { threshold: 0.05 });
+        const focusMaps = document.getElementById("vancouver-focus");
+        if (focusMaps) mapObserver.observe(focusMaps);
+    } else {
+        initializeFocusMaps();
+    }
+})();
+</script>
+
+{% if current_user.is_authenticated %}
+<script>
+(() => {
+    "use strict";
+
+    const fetchButton = document.getElementById("fetch-listing-button");
+    const listingUrlInput = document.getElementById("listing_url");
+    const statusBox = document.getElementById("fetch-status");
+    const csrfInput = document.getElementById("csrf_token");
+
+    const civicNumberInput = document.getElementById("civic_number");
+    const streetInput = document.getElementById("street");
+    const areaInput = document.getElementById("area");
+    const rentInput = document.getElementById("monthly_rent");
+    const bedroomsInput = document.getElementById("bedrooms");
+    const descriptionInput = document.getElementById("description");
+
+    if (
+        !fetchButton ||
+        !listingUrlInput ||
+        !statusBox ||
+        !csrfInput
+    ) {
+        return;
+    }
+
+    function showStatus(message, type = "") {
+        // textContent prevents fetched page text from being interpreted as HTML.
+        statusBox.textContent = message;
+        statusBox.className = "fetch-status";
+
+        if (type) {
+            statusBox.classList.add(type);
+        }
+    }
+
+    fetchButton.addEventListener("click", async () => {
+        const listingUrl = listingUrlInput.value.trim();
+
+        if (!listingUrl) {
+            showStatus("Paste a rental listing URL first.", "warning");
+            listingUrlInput.focus();
+            return;
+        }
+
+        let parsedUrl;
+
+        try {
+            parsedUrl = new URL(listingUrl);
+        } catch {
+            showStatus("Enter a valid listing URL.", "error");
+            listingUrlInput.focus();
+            return;
+        }
+
+        if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+            showStatus(
+                "The listing URL must begin with http:// or https://.",
+                "error"
+            );
+
+            listingUrlInput.focus();
+            return;
+        }
+
+        fetchButton.disabled = true;
+        fetchButton.textContent = "Fetching...";
+
+        showStatus(
+            "Trying to read the public listing. This may take a little while."
+        );
+
+        try {
+            const response = await fetch(
+                "{{ url_for('fetch_listing') }}",
+                {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRFToken": csrfInput.value
+                    },
+                    body: JSON.stringify({
+                        listing_url: listingUrl
+                    })
+                }
+            );
+
+            const result = await response.json().catch(() => ({}));
+
+            if (!response.ok || !result.success) {
+                throw new Error(
+                    result.error ||
+                    "The listing could not be fetched. You can enter the details manually."
+                );
+            }
+
+            const details = result.details || {};
+
+            const notes = Array.isArray(details.extraction_notes)
+                ? details.extraction_notes
+                : [];
+
+            // Fill suggested values only when a field is currently empty.
+            // The user can still edit any suggested value.
+
+            if (details.street_number && !civicNumberInput.value.trim()) {
+                civicNumberInput.value = details.street_number;
+            }
+
+            if (details.street && !streetInput.value.trim()) {
+                streetInput.value = details.street;
+            }
+
+            if (details.area && !areaInput.value) {
+                const matchingOption = Array.from(areaInput.options).find(
+                    option =>
+                        option.value.toLowerCase() ===
+                        details.area.toLowerCase()
+                );
+
+                if (matchingOption) {
+                    areaInput.value = matchingOption.value;
+                }
+            }
+
+            if (details.monthly_rent && !rentInput.value) {
+                const rent = Number(details.monthly_rent);
+
+                if (Number.isFinite(rent) && rent > 0 && rent <= 100000) {
+                    rentInput.value = String(rent);
+                }
+            }
+
+            if (details.bedrooms && !bedroomsInput.value) {
+                const bedroomCount = String(details.bedrooms);
+
+                if (["1", "2", "3"].includes(bedroomCount)) {
+                    bedroomsInput.value = bedroomCount;
+                }
+            }
+
+            // Never replace text the user has already entered.
+            if (
+                details.description &&
+                !descriptionInput.value.trim()
+            ) {
+                descriptionInput.value = details.description;
+            }
+
+            let message = result.message ||
+                "Listing text retrieved. Review the suggested values.";
+
+            if (notes.length) {
+                message += " " + notes.join(" ");
+            }
+
+            message +=
+                " Check the address, rent and bedrooms before running your checks.";
+
+            showStatus(message, "success");
+
+        } catch (error) {
+            showStatus(
+                error instanceof Error
+                    ? error.message
+                    : "Something went wrong. Please enter the details manually.",
+                "error"
+            );
+
+        } finally {
+            fetchButton.disabled = false;
+            fetchButton.textContent = "Fetch Listing Details";
+        }
+    });
+})();
+</script>
+{% endif %}
+
+</body>
+</html>

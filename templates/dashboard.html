@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Dashboard | RentalShield</title>
+  <meta name="description" content="View and manage your saved RentalShield reports.">
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --line: #293e56;
+      --text: #f3f7fc;
+      --muted: #a7b8cc;
+      --mint: #65e5c7;
+      --red: #ff9ca6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(ellipse at 10% 0%, #123149, transparent 40%), var(--bg);
+      color: var(--text);
+      font: 16px/1.6 Inter, system-ui, Arial, sans-serif;
+    }
+
+    a { color: var(--mint); }
+    button { font: inherit; }
+
+    a:focus-visible, button:focus-visible {
+      outline: 3px solid var(--mint);
+      outline-offset: 3px;
+    }
+
+    .wrap { width: min(1120px, 92%); margin: auto; }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: #07111fee;
+    }
+
+    nav {
+      min-height: 74px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--text);
+      font-weight: 900;
+      font-size: 1.25rem;
+      text-decoration: none;
+    }
+
+    .brand span { color: var(--mint); }
+
+    .links {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .links a { text-decoration: none; }
+
+    .btn {
+      display: inline-block;
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--mint);
+      color: #06221f;
+      font-weight: 850;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .ghost {
+      background: #14273b;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    main { flex: 1; padding: 42px 0 60px; }
+
+    .eyebrow {
+      color: var(--mint);
+      font-size: .75rem;
+      letter-spacing: .16em;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -.05em;
+      margin: 12px 0;
+    }
+
+    h2 { margin-top: 0; }
+
+    .muted { color: var(--muted); }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: linear-gradient(145deg, #102238, #0b1929);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin: 24px 0 32px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .stat-value {
+      display: block;
+      color: var(--mint);
+      font-size: 2rem;
+      font-weight: 900;
+      overflow-wrap: anywhere;
+    }
+
+    .report-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .report-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .report-title {
+      margin: 0 0 6px;
+      font-size: 1.15rem;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: #23354a;
+      font-size: .78rem;
+      font-weight: 850;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .delete-form { margin: 0; }
+
+    .delete-btn {
+      padding: 10px 13px;
+      border: 1px solid #70404a;
+      border-radius: 10px;
+      background: #351e29;
+      color: var(--red);
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .empty {
+      padding: 38px 20px;
+      text-align: center;
+      border: 1px dashed #3a536d;
+      border-radius: 18px;
+      color: var(--muted);
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      background: #3d202a;
+      color: #ffd8dd;
+      margin: 12px 0;
+    }
+
+    .good {
+      background: #15372c;
+      color: #d7ffe4;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 25px 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 700px) {
+      .stats { grid-template-columns: 1fr; }
+      .panel { padding: 19px; }
+      main { padding-top: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="wrap">
+      <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+
+      <div class="links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a class="btn" href="{{ url_for('home') }}#check">Check a rental</a>
+
+        <form method="post" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn ghost" type="submit">Sign out</button>
+        </form>
+      </div>
+    <a href="{{ url_for('analytics') }}" class="brand">Analytics</a>
+  </nav>
+  </header>
+
+  <main class="wrap">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+      <div class="alert {{ 'good' if category != 'error' else '' }}" role="status">
+        {{ message }}
+      </div>
+    {% endfor %}
+
+    {% if error %}
+      <div class="alert" role="alert">{{ error }}</div>
+    {% endif %}
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">Your rental workspace</div>
+        <h1>My Dashboard</h1>
+        <p class="muted">
+          Welcome back, {{ current_user.username }}. Your saved rental checks are organised here.
+        </p>
+      </div>
+
+      <a class="btn" href="{{ url_for('home') }}#check">+ Check a new rental</a>
+    </section>
+
+    <section class="stats">
+      <article class="panel">
+        <span class="stat-label">Saved reports</span>
+        <strong class="stat-value">{{ reports|length }}</strong>
+        <p class="muted">Reports in your history</p>
+      </article>
+
+      <article class="panel">
+        <span class="stat-label">Account</span>
+        <strong class="stat-value" style="font-size: 1.25rem;">{{ current_user.username }}</strong>
+        <p class="muted">Your RentalShield profile</p>
+      </article>
+
+      <article class="panel">
+        <span class="stat-label">Next step</span>
+        <strong class="stat-value" style="font-size: 1.25rem;">Verify</strong>
+        <p class="muted">Check the details before committing.</p>
+      </article>
+    </section>
+
+    <section>
+      <div>
+        <div class="eyebrow">Verification history</div>
+        <h2>Your saved reports</h2>
+        <p class="muted">
+          Open a report to review its findings. Remove a report only when you no longer need it.
+        </p>
+      </div>
+
+      {% if reports %}
+        <div class="report-list">
+          {% for report in reports %}
+            <article class="panel">
+              <div class="report-top">
+                <div>
+                  <h3 class="report-title">
+                    Rental check #{{ report.id }}
+                  </h3>
+
+                  <div class="meta">
+                    {% if report.created_at %}
+                      Created:
+                      {{ report.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+                    {% else %}
+                      Date unavailable
+                    {% endif %}
+                  </div>
+                </div>
+
+                <span class="badge">Saved report</span>
+              </div>
+
+              <div class="actions">
+                <a
+                  class="btn"
+                  href="{{ url_for('report_detail', report_id=report.id) }}"
+                >
+                  View report →
+                </a>
+
+                <form
+                  class="delete-form"
+                  method="post"
+                  action="{{ url_for('delete_report', report_id=report.id) }}"
+                  onsubmit="return confirm('Are you sure you want to delete this saved report?');"
+                >
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="delete-btn" type="submit">Delete report</button>
+                </form>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">
+          <h3>No saved reports yet</h3>
+          <p>
+            Your rental checks will appear here after you run a check while signed in.
+          </p>
+          <a class="btn" href="{{ url_for('home') }}#check">Run your first check →</a>
+        </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+      <p>
+        RentalShield provides preliminary screening information, not a guarantee of legitimacy or safety.
+      </p>
+      © RentalShield
+    </div>
+  </footer>
+</body>
+</html>

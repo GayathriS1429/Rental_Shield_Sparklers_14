@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in | RentalShield</title>
+  <meta name="description" content="Sign in to RentalShield to review rental checks and saved reports.">
+
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: #102238;
+      --line: #293e56;
+      --text: #f3f7fc;
+      --muted: #a7b8cc;
+      --mint: #65e5c7;
+      --red: #ff9ca6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(ellipse at 10% 0%, #123149, transparent 40%), var(--bg);
+      color: var(--text);
+      font: 16px/1.6 Inter, system-ui, Arial, sans-serif;
+    }
+
+    a { color: var(--mint); }
+
+    button, input { font: inherit; }
+
+    a:focus-visible, button:focus-visible, input:focus-visible {
+      outline: 3px solid var(--mint);
+      outline-offset: 3px;
+    }
+
+    .wrap { width: min(1120px, 92%); margin: auto; }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: #07111fee;
+    }
+
+    nav {
+      min-height: 74px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--text);
+      font-weight: 900;
+      font-size: 1.25rem;
+      text-decoration: none;
+    }
+
+    .brand span { color: var(--mint); }
+
+    .nav-link { text-decoration: none; }
+
+    main {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 45px 0;
+    }
+
+    .layout {
+      width: min(920px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .intro { padding: 20px 0; }
+
+    .eyebrow {
+      color: var(--mint);
+      font-size: .75rem;
+      letter-spacing: .16em;
+      font-weight: 850;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(2.3rem, 5vw, 3.8rem);
+      line-height: 1.05;
+      letter-spacing: -.05em;
+      margin: 14px 0;
+    }
+
+    .muted { color: var(--muted); }
+
+    .panel {
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(145deg, #102238, #0b1929);
+      box-shadow: 0 20px 60px #00000020;
+    }
+
+    .panel h2 { margin-top: 0; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin: 18px 0;
+    }
+
+    label { font-size: .9rem; font-weight: 750; }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #3a526a;
+      border-radius: 10px;
+      background: #071522;
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 13px 17px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--mint);
+      color: #06221f;
+      font-weight: 850;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .alert {
+      padding: 12px 15px;
+      border-radius: 10px;
+      background: #3d202a;
+      color: #ffd8dd;
+      margin: 12px 0;
+    }
+
+    .good {
+      background: #15372c;
+      color: #d7ffe4;
+    }
+
+    .hint { font-size: .84rem; color: var(--muted); }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 25px 0;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+      .intro { padding: 0; }
+      .panel { padding: 22px; }
+      main { padding: 30px 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="wrap">
+      <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+      <a class="nav-link" href="{{ url_for('home') }}">← Back to home</a>
+    <a href="{{ url_for('analytics') }}" class="brand">Analytics</a>
+  </nav>
+  </header>
+
+  <main class="wrap">
+    <div class="layout">
+      <section class="intro">
+        <div class="eyebrow">Welcome back</div>
+        <h1>Your next rental decision starts with <span style="color: var(--mint)">clarity.</span></h1>
+        <p class="muted">
+          Sign in to run rental checks, review findings and access your saved reports.
+        </p>
+        <p class="muted">Evidence-informed checks. Clear explanations. Reports you can revisit.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Sign in</h2>
+        <p class="muted">Enter your account details to continue.</p>
+
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+          <div class="alert {{ 'good' if category != 'error' else '' }}" role="status">
+            {{ message }}
+          </div>
+        {% endfor %}
+
+        {% if error %}
+          <div class="alert" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('login') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="field">
+            <label for="username">Username or email</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              maxlength="254"
+              placeholder="Enter your username or email"
+              value="{{ request.form.get('username', '') }}"
+              required
+              autofocus
+            >
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <button class="btn" type="submit">Sign in securely →</button>
+        </form>
+
+        <p class="hint">
+          New to RentalShield?
+          <a href="{{ url_for('register') }}">Create an account</a>
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+      <p>Preliminary rental screening, not a guarantee of legitimacy or safety.</p>
+      © RentalShield
+    </div>
+  </footer>
+</body>
+</html>

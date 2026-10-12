@@ -1,0 +1,260 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>RentalShield | Analytics</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <style>
+
+    :root{--navy:#102a43;--teal:#087f70;--mint:#e9f7f4;--ink:#172b3a;--muted:#617282;--line:#dce5eb;--paper:#f5f8fa;--white:#fff;--amber:#fff6df;--red:#fff0ee}
+
+    *{box-sizing:border-box} body{margin:0;background:var(--paper);font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);line-height:1.5}
+
+    a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}.topbar{background:var(--navy);color:white;padding:15px 5vw;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{font-size:1.25rem;font-weight:800;letter-spacing:.2px}.nav{display:flex;gap:18px;flex-wrap:wrap}.nav a{color:white;font-size:.95rem}.wrap{max-width:1200px;margin:0 auto;padding:28px 22px 54px}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--teal);font-size:.75rem;font-weight:800}.heading{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:24px}.heading h1{font-size:clamp(2rem,4vw,2.8rem);line-height:1.1;margin:6px 0}.intro{max-width:740px;color:var(--muted);margin:0}.pill{display:inline-block;border:1px solid #b9d8d1;background:var(--mint);color:#07594f;border-radius:999px;padding:5px 10px;font-size:.8rem;font-weight:700}.notice{padding:14px 16px;border-radius:12px;background:var(--amber);border:1px solid #efdfb6;margin:18px 0;color:#644f21}.notice.urgent{background:var(--red);border-color:#f0c7c0;color:#7d3026}.section{margin-top:30px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:13px}.section h2{font-size:1.35rem;margin:0}.section p.sub{margin:4px 0 0;color:var(--muted);font-size:.92rem}.grid{display:grid;gap:16px}.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.cols{grid-template-columns:repeat(2,minmax(0,1fr))}.metric,.panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:0 4px 14px rgba(16,42,67,.035);min-width:0}.metric .label{color:var(--muted);font-size:.86rem;font-weight:650}.metric .value{font-size:1.85rem;letter-spacing:-.03em;font-weight:800;margin:4px 0}.metric .detail{font-size:.82rem;color:var(--muted)}.panel h3{margin:0 0 4px;font-size:1.02rem}.panel .muted{color:var(--muted);font-size:.86rem;margin:0 0 14px}.chart-wrap{height:310px;position:relative}.filterbar,.rent-form{display:flex;align-items:end;gap:12px;flex-wrap:wrap;background:white;border:1px solid var(--line);border-radius:14px;padding:15px}.field{display:flex;flex-direction:column;gap:5px;min-width:140px;flex:1}.field label{font-size:.82rem;color:var(--muted);font-weight:700}.field input,.field select{width:100%;padding:10px 11px;border:1px solid #cbd7df;border-radius:9px;background:white;color:var(--ink);font:inherit}.check{display:flex;align-items:center;gap:8px;padding:10px 0;color:var(--muted);font-size:.85rem}.btn{border:0;border-radius:9px;background:var(--teal);color:white;font-weight:750;padding:11px 16px;cursor:pointer;font:inherit}.btn:hover{background:#06695e}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}.small{font-size:.82rem;color:var(--muted)}.comparison{margin-top:16px;background:var(--mint);border:1px solid #b9d8d1;border-radius:12px;padding:16px}.comparison strong{font-size:1.15rem}.area-card h3{font-size:1rem}.area-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.area-stats div{background:#f6fafb;border-radius:9px;padding:10px}.area-stats strong{display:block;font-size:1.15rem}.area-stats span{display:block;font-size:.75rem;color:var(--muted)}.footer-note{font-size:.83rem;color:var(--muted);margin-top:12px}.quality{border-left:4px solid var(--teal);padding:11px 14px;background:#f6fbfa;border-radius:0 10px 10px 0;margin:10px 0}.empty{padding:22px;border:1px dashed #cbd7df;border-radius:12px;background:white;color:var(--muted)}
+
+    @media (max-width: 900px) {
+      .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cols { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 520px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric { padding: 14px; }
+      .metric .value { font-size: 1.45rem; }
+      .wrap { padding: 22px 14px 40px; }
+      .chart-wrap { height: 270px; }
+      .area-stats { grid-template-columns: 1fr 1fr; }
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header class="topbar">
+
+    <a class="brand" href="{{ url_for('home') }}" style="color:white">RentalShield</a>
+
+    <nav class="nav" aria-label="Main navigation">
+
+      <a href="{{ url_for('home') }}">Home</a>
+
+      <a href="{{ url_for('about') }}">About</a>
+
+      <a href="{{ url_for('dashboard') }}">My Dashboard</a>
+
+      <a href="{{ url_for('analytics') }}" aria-current="page"><strong>Analytics</strong></a>
+
+    </nav>
+
+  </header>
+
+  <main class="wrap">
+
+    <div class="heading">
+
+      <div><div class="eyebrow">Vancouver rental context</div><h1>Rental market analytics</h1><p class="intro">Explore published asking-rent benchmarks, police-reported incident patterns, and the coverage of RentalShield’s address reference data. These indicators help with context—not a guarantee that any listing or property is safe.</p></div>
+
+      <span class="pill">Source-backed · Exploratory</span>
+
+    </div>
+
+
+
+    {% if not data_ready %}
+
+      <div class="notice urgent"><strong>Analytics data is not ready.</strong> The page could not find all required EDA outputs. Run <code>python rentalshield_eda.py</code> from your project root and check <code>analytics/eda_outputs/</code>. Missing files: {{ missing_files|join(', ') if missing_files else 'one or more output files could not be parsed' }}.</div>
+
+    {% endif %}
+
+
+
+    <div class="notice"><strong>Read this before comparing:</strong> crime totals are reported records, not population-adjusted rates. The crime source calls the first area “Central Business District”; address coverage calls it “Downtown,” and their boundaries may not match exactly. 2026 is year-to-date through {{ latest_date or 'the latest available record' }}. {{ duplicate_rows_flagged|default(0) }} rows are flagged as exact repeats for review and have not been silently deleted.</div>
+
+
+
+    <section class="grid metrics" aria-label="Data overview">
+
+      <div class="metric"><div class="label">Police-reported records</div><div class="value">{{ '{:,}'.format(total_crime_rows) }}</div><div class="detail">Across the supplied CBD and West End files</div></div>
+
+      <div class="metric"><div class="label">Exact repeats flagged</div><div class="value">{{ '{:,}'.format(duplicate_rows_flagged) }}</div><div class="detail">Retained pending source-level validation</div></div>
+
+      <div class="metric"><div class="label">Privacy-protected locations</div><div class="value">{{ '{:,}'.format(privacy_rows) }}</div><div class="detail">Not suitable for address-level matching</div></div>
+
+      <div class="metric"><div class="label">Data period</div><div class="value" style="font-size:1.35rem">{{ earliest_date or 'N/A' }} – {{ latest_date or 'N/A' }}</div><div class="detail">Source incident dates</div></div>
+
+    </section>
+
+
+
+    <section class="section" id="crime">
+
+      <div class="section-head"><div><h2>Police-reported incident patterns</h2><p class="sub">Use the filters to explore source records. The charts update when you apply the filter.</p></div></div>
+
+      <form class="filterbar" method="get" action="{{ url_for('analytics') }}#crime">
+
+        <div class="field"><label for="year">Monthly trend year</label><select id="year" name="year">{% for y in [2023, 2024, 2025, 2026] %}<option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}{% if y == 2026 %} (partial){% endif %}</option>{% endfor %}</select></div>
+
+        <div class="field"><label for="area">Area for monthly trend and category chart</label><select id="area" name="area"><option value="all" {% if selected_area == 'all' %}selected{% endif %}>Both areas</option><option value="downtown" {% if selected_area == 'downtown' %}selected{% endif %}>Downtown / CBD source</option><option value="west_end" {% if selected_area == 'west_end' %}selected{% endif %}>West End</option></select></div>
+
+        <label class="check"><input type="checkbox" name="exclude_duplicates" value="1" {% if exclude_duplicates %}checked{% endif %}> Exclude rows flagged as exact repeats in charts</label>
+
+        <input type="hidden" name="rent" value="{{ rent_text }}"><input type="hidden" name="bedrooms" value="{{ bedroom_input }}">
+
+        <button class="btn" type="submit">Update charts</button>
+
+      </form>
+
+      <p class="small">Showing {{ '{:,}'.format(chart_crime_rows) }} records in charts{% if exclude_duplicates %}, after excluding {{ '{:,}'.format(duplicate_rows_flagged) }} rows flagged as exact repeats{% endif %}. This is a sensitivity view, not a claim that every flagged row is invalid.</p>
+
+
+
+      <div class="grid cols" style="margin-top:16px">
+
+        <article class="panel"><h3>Annual record counts</h3><p class="muted">2026 is year-to-date and should not be compared as a full-year total.</p><div class="chart-wrap"><canvas id="annualChart" aria-label="Annual police reported incident record counts"></canvas></div></article>
+
+        <article class="panel"><h3>Monthly records · {{ selected_year }}</h3><p class="muted">Counts by incident month, for the selected area(s). 2026 contains only available months.</p><div class="chart-wrap"><canvas id="monthlyChart" aria-label="Monthly police reported incident record counts"></canvas></div></article>
+
+        <article class="panel"><h3>Most frequent recorded categories</h3><p class="muted">Top eight categories in the selected area filter, across available dates.</p><div class="chart-wrap"><canvas id="categoryChart" aria-label="Most frequent recorded crime categories"></canvas></div></article>
+
+        <article class="panel"><h3>Completed-year comparison</h3><p class="muted">Change between 2023 and 2025, excluding the partial 2026 year.</p>
+
+          <div class="table-scroll"><table><thead><tr><th>Area label</th><th>2023 records</th><th>2025 records</th><th>Change</th></tr></thead><tbody>{% for item in year_change %}<tr><td>{{ item.area }}</td><td>{{ '{:,}'.format(item.count_2023) }}</td><td>{{ '{:,}'.format(item.count_2025) }}</td><td>{% if item.percent_change is not none %}{{ '+' if item.percent_change > 0 else '' }}{{ item.percent_change }}%{% else %}N/A{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+
+          <div class="quality">Raw record totals can be affected by duplicate records, privacy protections, reporting practices, and differences in area boundaries. They do not estimate an individual renter’s risk.</div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+
+    <section class="section" id="rent">
+
+      <div class="section-head"><div><h2>Monthly asking-rent benchmark</h2><p class="sub">Compare a listing’s asking rent with the extracted Q2 2026 Vancouver Census Metropolitan Area (CMA) average asking rent.</p></div></div>
+
+      {% if benchmarks %}
+
+        <div class="grid cols">
+
+          <article class="panel"><h3>Reference benchmarks</h3><p class="muted">These are CMA-level averages, not Downtown or West End neighbourhood estimates.</p><div class="table-scroll"><table><thead><tr><th>Bedrooms</th><th>Average asking rent</th><th>Source geography</th></tr></thead><tbody>{% for b in benchmarks %}<tr><td>{{ b.bedroom_category }}</td><td><strong>{{ b.display_value }}</strong></td><td>{{ b.geography }}</td></tr>{% endfor %}</tbody></table></div><p class="footer-note">Source values were extracted from the supplied Q2 2026 benchmark CSV exports; original raw values are retained in the EDA output.</p></article>
+
+          <article class="panel"><h3>Check a listing’s asking rent</h3><p class="muted">This comparison provides market context only. A price above or below the average does not prove fraud or legitimacy.</p>
+
+            <form class="rent-form" method="get" action="{{ url_for('analytics') }}#rent">
+
+              <div class="field"><label for="rent-input">Monthly rent (CAD)</label><input id="rent-input" name="rent" type="number" min="1" max="100000" step="1" placeholder="e.g. 2600" value="{{ rent_text }}" required></div>
+
+              <div class="field"><label for="bedrooms-input">Bedrooms</label><select id="bedrooms-input" name="bedrooms"><option value="1" {% if bedroom_input == '1' %}selected{% endif %}>1 bedroom</option><option value="2" {% if bedroom_input == '2' %}selected{% endif %}>2 bedrooms</option><option value="3" {% if bedroom_input == '3' %}selected{% endif %}>3+ bedrooms</option></select></div>
+
+              <input type="hidden" name="year" value="{{ selected_year }}"><input type="hidden" name="area" value="{{ selected_area }}">{% if exclude_duplicates %}<input type="hidden" name="exclude_duplicates" value="1">{% endif %}
+
+              <button class="btn" type="submit">Compare rent</button>
+
+            </form>
+
+            {% if rent_text and not rent_comparison %}<div class="notice urgent">Enter a valid monthly rent to compare it with the selected benchmark.</div>{% endif %}
+
+            {% if rent_comparison %}<div class="comparison"><div>Your entered rent is <strong>{{ rent_comparison.direction }} the benchmark by {{ rent_comparison.difference_display }}</strong>.</div><p style="margin:8px 0 0">Entered rent: <strong>${{ '{:,.0f}'.format(rent_comparison.entered_rent) }}</strong> · {{ rent_comparison.bedroom_label }} benchmark: <strong>${{ '{:,.0f}'.format(rent_comparison.benchmark) }}</strong></p><p style="margin:4px 0 0">Difference: <strong>{{ '+' if rent_comparison.percent_difference > 0 else '' }}{{ rent_comparison.percent_difference }}%</strong> vs the average asking rent.</p></div>{% endif %}
+
+          </article>
+
+        </div>
+
+      {% else %}<div class="empty">Rent benchmarks not found. Re-run EDA and check <code>rent_benchmarks_extracted.csv</code>.</div>{% endif %}
+
+    </section>
+
+
+
+    <section class="section" id="coverage">
+
+      <div class="section-head"><div><h2>Address reference-data coverage</h2><p class="sub">Shows how much of the supplied property-address reference data can be normalized for matching.</p></div></div>
+
+      <div class="grid cols">{% for a in address_cards %}<article class="panel area-card"><h3>{{ a.area }}</h3><div class="area-stats"><div><strong>{{ '{:,}'.format(a.rows) }}</strong><span>Source rows</span></div><div><strong>{{ '{:,}'.format(a.unique_addresses) }}</strong><span>Unique normalized addresses</span></div><div><strong>{{ '{:,}'.format(a.missing_addresses) }}</strong><span>Rows missing full address</span></div></div></article>{% endfor %}</div>
+
+      <div class="notice">Repeated normalized addresses are not automatically treated as erroneous duplicate properties: one address may legitimately occur in multiple source records. A match to this reference data does not independently verify ownership, landlord identity, vacancy, or permission to rent.</div>
+
+    </section>
+
+
+
+    <section class="section" id="fraud-context">
+
+      <div class="section-head"><div><h2>Fraud data: what it can tell us</h2><p class="sub">The supplied Canadian Anti-Fraud Centre (CAFC) dataset supports broad reporting context, not address-level verification.</p></div></div>
+
+      <div class="panel"><div class="grid metrics" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="label">CAFC dataset records</div><div class="value">{{ '{:,}'.format(fraud_records) if fraud_records is not none else 'Not available' }}</div></div><div><div class="label">Distinct thematic category labels</div><div class="value">{{ fraud_categories if fraud_categories is not none else 'Not available' }}</div></div></div><p class="footer-note">The available profile does not establish that a specific rental listing, address, landlord, or deposit is fraudulent. RentalShield therefore does not convert these national records into an address fraud score.</p></div>
+
+    </section>
+
+
+
+    <section class="section" id="quality">
+
+      <div class="section-head"><div><h2>Data quality and source coverage</h2><p class="sub">Transparency about repeated rows and locations that cannot be mapped precisely.</p></div></div>
+
+      {% if quality_table %}<div class="panel table-scroll"><table><thead><tr><th>Source file</th><th>Rows</th><th>Exact repeats flagged</th><th>Privacy-protected locations</th></tr></thead><tbody>{% for q in quality_table %}<tr><td>{{ q.source_file }}</td><td>{{ '{:,}'.format(q.rows) }}</td><td>{{ '{:,}'.format(q.duplicates) }}</td><td>{{ '{:,}'.format(q.privacy_rows) }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty">Duplicate audit output not found.</div>{% endif %}
+
+      <p class="footer-note">Incident counts are exploratory and are not population-adjusted rates. Crime records with privacy-protected locations are not used to make address-level claims. Validate important rental details independently before sending money or signing a lease.</p>
+
+    </section>
+
+  </main>
+
+  <script id="analytics-chart-data" type="application/json">
+    {{ {
+      "annual": annual_chart_json,
+      "monthly": month_chart_json,
+      "category": category_chart_json
+    }|tojson }}
+  </script>
+  <script>
+
+    const chartDataElement = document.getElementById('analytics-chart-data');
+    const chartData = chartDataElement ? JSON.parse(chartDataElement.textContent) : {};
+    const annualData = chartData.annual || {labels: [], datasets: []};
+    const monthlyData = chartData.monthly || {labels: [], datasets: []};
+    const categoryData = chartData.category || {labels: [], data: []};
+
+    const palette = ['#087f70', '#ed8b23', '#4678b8', '#a45a92'];
+
+    Chart.defaults.font.family = 'Inter, Segoe UI, Arial, sans-serif';
+
+    Chart.defaults.color = '#526575';
+
+    const common = {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}, tooltip:{mode:'index', intersect:false}}};
+
+    if (document.getElementById('annualChart')) {
+
+      new Chart(document.getElementById('annualChart'), {type:'line', data:{labels:annualData.labels, datasets:annualData.datasets.map((d,i)=>({...d,borderColor:palette[i],backgroundColor:palette[i],tension:.25,pointRadius:3,spanGaps:false}))}, options:{...common, scales:{y:{beginAtZero:true,title:{display:true,text:'Incident records (not a rate)'}}}}});
+
+    }
+
+    if (document.getElementById('monthlyChart')) {
+
+      new Chart(document.getElementById('monthlyChart'), {type:'line', data:{labels:monthlyData.labels, datasets:monthlyData.datasets.map((d,i)=>({...d,borderColor:palette[i],backgroundColor:palette[i],tension:.25,pointRadius:3}))}, options:{...common, scales:{y:{beginAtZero:true,title:{display:true,text:'Incident records'}}}}});
+
+    }
+
+    if (document.getElementById('categoryChart')) {
+
+      new Chart(document.getElementById('categoryChart'), {type:'bar', data:{labels:categoryData.labels, datasets:[{label:'Records',data:categoryData.data,backgroundColor:'#087f70',borderRadius:5}]}, options:{...common,indexAxis:'y',plugins:{legend:{display:false},tooltip:{mode:'nearest'}},scales:{x:{beginAtZero:true,title:{display:true,text:'Incident records'}}}}});
+
+    }
+
+  </script>
+
+</body>
+
+</html>

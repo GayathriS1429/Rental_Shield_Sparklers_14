@@ -1,0 +1,8 @@
+dataset,rows,missing_civic_number,missing_street,unique_canonical_addresses,duplicate_canonical_rows,status,note,exact_duplicate_rows_flagged,privacy_protected_location_rows,zero_coordinate_rows,missing_type_before_fill,missing_neighbourhood_before_fill,date_min,date_max,rows_parsed,vancouver_rows_found,columns
+property_addresses_downtown.csv,1810.0,69.0,69.0,1163.0,578.0,loaded,"Repeated canonical addresses are flagged, not automatically treated as erroneous duplicate properties.",,,,,,,,,,
+property_addresses_west_end.csv,1292.0,40.0,40.0,939.0,313.0,loaded,"Repeated canonical addresses are flagged, not automatically treated as erroneous duplicate properties.",,,,,,,,,,
+combined_police_crime,52789.0,,,,,loaded; duplicates preserved and audit exported,Do not automatically delete repeated rows. Privacy-protected locations are not geocodable. Counts are not population-adjusted rates; 2026 may be partial.,3917.0,6099.0,6099.0,0.0,0.0,2023-01-01 00:00:00,2026-10-02 00:00:00,,,
+rent_benchmark_1br_q2_2026.csv,,,,,,loaded,,,,,,,,,51.0,1.0,
+rent_benchmark_2br_q2_2026.csv,,,,,,loaded,,,,,,,,,51.0,1.0,
+rent_benchmark_3br_q2_2026.csv,,,,,,loaded,,,,,,,,,51.0,1.0,
+cafc_fraud_reporting.csv,350361.0,,,,,loaded; schema/definitions need review,General or national fraud reports do not establish rental-deposit fraud at a specific address.,,,,,,,,,,21.0

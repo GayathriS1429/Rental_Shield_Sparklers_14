@@ -1,0 +1,22 @@
+column,dtype,missing_count,missing_percent,unique_values
+Numéro d'identification / Number ID,int64,0,0.0,350361
+Date Received / Date reçue,str,0,0.0,1730
+Complaint Received Type,str,0,0.0,10
+Type de plainte reçue,str,0,0.0,10
+Country,str,0,0.0,161
+Pays,str,0,0.0,161
+Province/State,str,0,0.0,67
+Province/État,str,0,0.0,67
+Fraud and Cybercrime Thematic Categories,str,0,0.0,39
+Catégories thématiques sur la fraude et la cybercriminalité,str,0,0.0,39
+Solicitation Method,str,0,0.0,14
+Méthode de sollicitation,str,0,0.0,14
+Gender,str,0,0.0,6
+Genre,str,0,0.0,6
+Language of Correspondence,str,0,0.0,3
+Langue de correspondance,str,0,0.0,3
+Victim Age Range / Tranche d'âge des victimes,str,0,0.0,14
+Complaint Type,str,0,0.0,5
+Type de plainte,str,0,0.0,5
+Number of Victims / Nombre de victimes,int64,0,0.0,2
+Dollar Loss /pertes financières,str,0,0.0,26882

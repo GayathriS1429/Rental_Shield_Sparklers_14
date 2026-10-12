@@ -1,0 +1,14 @@
+Flask
+pandas
+numpy
+scikit-learn
+requests
+beautifulsoup4
+python-dotenv
+Pillow
+Flask-Login
+Flask-SQLAlchemy
+Flask-WTF
+email-validator
+matplotlib
+pyproj>=3.6,<4

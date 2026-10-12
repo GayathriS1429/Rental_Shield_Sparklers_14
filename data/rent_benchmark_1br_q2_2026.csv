@@ -1,0 +1,71 @@
+﻿"Asking rent and paid rent prices, by rental unit type and number of bedrooms, experimental estimates 1"
+"Frequency: Quarterly"
+"Table: 46-10-0092-01"
+"Release date: 2026-09-09"
+"Geography: Census metropolitan area, Census metropolitan area part"
+""
+""
+
+"Rental unit type","Apartment - 1 bedroom",
+"Estimates","Average asking rent","Average paid rent 2"
+"Geography","Q2 2026","Q2 2026"
+,"Dollars",
+"All census metropolitan areas","1,730",".."
+"St. John's, Census metropolitan area (CMA)","1,270",".."
+"Halifax, Census metropolitan area (CMA)","1,880",".."
+"Fredericton, Census metropolitan area (CMA)","1,430",".."
+"Moncton, Census metropolitan area (CMA)","1,290",".."
+"Saint John, Census metropolitan area (CMA)","1,230",".."
+"Drummondville, Census metropolitan area (CMA)","..",".."
+"Montréal, Census metropolitan area (CMA)","1,480","1,170"
+"Ottawa - Gatineau (Quebec part), Census metropolitan area (CMA)","1,440",".."
+"Québec, Census metropolitan area (CMA)","1,210",".."
+"Saguenay, Census metropolitan area (CMA)","..",".."
+"Sherbrooke, Census metropolitan area (CMA)","1,040",".."
+"Trois-Rivières, Census metropolitan area (CMA)","970E",".."
+"Barrie, Census metropolitan area (CMA)","1,830",".."
+"Belleville - Quinte West, Census metropolitan area (CMA)","1,650",".."
+"Brantford, Census metropolitan area (CMA)","1,610",".."
+"Greater Sudbury, Census metropolitan area (CMA)","1,630",".."
+"Guelph, Census metropolitan area (CMA)","1,860",".."
+"Hamilton, Census metropolitan area (CMA)","1,720",".."
+"Kingston, Census metropolitan area (CMA)","1,720",".."
+"Kitchener - Cambridge - Waterloo, Census metropolitan area (CMA)","1,740",".."
+"London, Census metropolitan area (CMA)","1,560",".."
+"Oshawa, Census metropolitan area (CMA)","1,720",".."
+"Ottawa - Gatineau (Ontario part), Census metropolitan area (CMA)","1,900","1,690"
+"Peterborough, Census metropolitan area (CMA)","1,600",".."
+"St. Catharines - Niagara, Census metropolitan area (CMA)","1,570",".."
+"Thunder Bay, Census metropolitan area (CMA)","1,470",".."
+"Toronto, Census metropolitan area (CMA)","2,090","1,840"
+"Windsor, Census metropolitan area (CMA)","1,520",".."
+"Winnipeg, Census metropolitan area (CMA)","1,320","1,260"
+"Regina, Census metropolitan area (CMA)","1,250",".."
+"Saskatoon, Census metropolitan area (CMA)","1,340",".."
+"Calgary, Census metropolitan area (CMA)","1,550",".."
+"Edmonton, Census metropolitan area (CMA)","1,260",".."
+"Lethbridge, Census metropolitan area (CMA)","1,270",".."
+"Red Deer, Census metropolitan area (CMA)","1,230",".."
+"Abbotsford - Mission, Census metropolitan area (CMA)","1,560",".."
+"Chilliwack, Census metropolitan area (CMA)","1,410",".."
+"Kamloops, Census metropolitan area (CMA)","1,590",".."
+"Kelowna, Census metropolitan area (CMA)","1,880",".."
+"Nanaimo, Census metropolitan area (CMA)","1,740",".."
+"Vancouver, Census metropolitan area (CMA)","2,280","1,890"
+"Victoria, Census metropolitan area (CMA)","2,040",".."
+
+Symbol legend:
+.., not available for a specific reference period
+E, use with caution
+
+
+
+
+Footnotes:
+1,"For information on methodological changes as well as the limitations specific to a given reference period, please consult the <a href="https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getMainChange&Id=1581113" rel="external noopener noreferrer" target="_blank">Summary of changes (opens new window)</a> page."
+2,"The average rent paid is based on a moving average of the last three quarters."
+
+
+
+"How to cite: Statistics Canada. Table 46-10-0092-01  Asking rent and paid rent prices, by rental unit type and number of bedrooms, experimental estimates"
+https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=4610009201

@@ -1,0 +1,4 @@
+file,bedroom_category,geography,asking_rent_raw,asking_rent_numeric,is_estimated,is_unavailable
+rent_benchmark_1br_q2_2026.csv,1 bedroom,"Vancouver, Census metropolitan area (CMA)","2,280",2280.0,False,False
+rent_benchmark_2br_q2_2026.csv,2 bedrooms,"Vancouver, Census metropolitan area (CMA)","3,030",3030.0,False,False
+rent_benchmark_3br_q2_2026.csv,3+ bedrooms,"Vancouver, Census metropolitan area (CMA)","4,150",4150.0,False,False

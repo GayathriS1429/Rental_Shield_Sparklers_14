@@ -1,0 +1,9 @@
+source_file,rows,exact_duplicate_rows,privacy_protected_location_rows,missing_type_before_fill
+West End_2023.csv,2877,231,497,0
+West End_2024.csv,2727,183,440,0
+West End_2025.csv,2671,159,375,0
+West End_2026.csv,2089,77,226,0
+cbd_2023.csv,12244,1073,1429,0
+cbd_2024.csv,11905,1062,1416,0
+cbd_2025.csv,10569,697,1034,0
+cbd_2026.csv,7707,435,682,0

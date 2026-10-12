@@ -1,0 +1,23 @@
+source_area,TYPE,incident_records
+Central Business District,Break and Enter Commercial,1447
+Central Business District,Break and Enter Residential/Other,438
+Central Business District,Homicide,19
+Central Business District,Mischief,8347
+Central Business District,Offence Against a Person,4542
+Central Business District,Other Theft,17797
+Central Business District,Theft from Vehicle,7975
+Central Business District,Theft of Bicycle,821
+Central Business District,Theft of Vehicle,281
+Central Business District,Vehicle Collision or Pedestrian Struck (with Fatality),7
+Central Business District,Vehicle Collision or Pedestrian Struck (with Injury),751
+West End,Break and Enter Commercial,506
+West End,Break and Enter Residential/Other,106
+West End,Homicide,3
+West End,Mischief,1339
+West End,Offence Against a Person,1535
+West End,Other Theft,4343
+West End,Theft from Vehicle,1822
+West End,Theft of Bicycle,369
+West End,Theft of Vehicle,113
+West End,Vehicle Collision or Pedestrian Struck (with Fatality),3
+West End,Vehicle Collision or Pedestrian Struck (with Injury),225

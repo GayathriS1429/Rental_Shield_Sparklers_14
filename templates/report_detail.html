@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rental Screening Report | RentalShield</title>
+    <meta name="description" content="Review your RentalShield four-part rental concern score, address and rent checks, nearby incident context, and alternative neighbourhood suggestions.">
+    <style>
+        :root {
+            --bg: #07111f;
+            --panel: #102238;
+            --panel-2: #0b1929;
+            --line: #293e56;
+            --text: #f3f7fc;
+            --muted: #a7b8cc;
+            --mint: #65e5c7;
+            --amber: #ffd18b;
+            --red: #ffb6c1;
+            --green: #b9f5d0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+            background: radial-gradient(ellipse at 10% 0%, #123149, transparent 40%), var(--bg);
+            color: var(--text); font: 16px/1.6 Inter, system-ui, Arial, sans-serif;
+        }
+        a { color: var(--mint); }
+        a:focus-visible, .btn:focus-visible { outline: 3px solid var(--mint); outline-offset: 3px; }
+        .wrap { width: min(1120px, 92%); margin: 0 auto; }
+        header { border-bottom: 1px solid var(--line); background: #07111fee; }
+        nav { min-height: 74px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .brand { color: var(--text); font-weight: 900; font-size: 1.25rem; text-decoration: none; }
+        .brand span { color: var(--mint); }
+        .links, .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .links a { text-decoration: none; }
+        .btn { display: inline-block; padding: 10px 15px; border: 0; border-radius: 10px; background: var(--mint); color: #06221f; font-weight: 850; text-decoration: none; text-align: center; cursor: pointer; }
+        .ghost { background: #14273b; color: var(--text); border: 1px solid var(--line); }
+        main { flex: 1; padding: 38px 0 58px; }
+        .eyebrow { color: var(--mint); font-size: .75rem; letter-spacing: .16em; font-weight: 850; text-transform: uppercase; }
+        h1 { font-size: clamp(2rem, 4.5vw, 3.15rem); line-height: 1.08; letter-spacing: -.04em; margin: 9px 0 12px; }
+        h2 { margin: 0 0 10px; font-size: 1.3rem; }
+        h3 { margin: 0 0 10px; font-size: 1.06rem; }
+        h4 { margin: 0 0 6px; }
+        p { margin: 8px 0 12px; }
+        .muted, small { color: var(--muted); }
+        .summary { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap; margin-bottom: 24px; }
+        .panel { padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(145deg, var(--panel), var(--panel-2)); min-width: 0; }
+        .score-panel { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); align-items: center; gap: 24px; margin-bottom: 18px; }
+        .score-number { display: flex; align-items: baseline; gap: 7px; font-size: clamp(2.6rem, 6vw, 4rem); font-weight: 950; letter-spacing: -.06em; line-height: 1.1; }
+        .score-number span:last-child { color: var(--muted); font-size: 1.1rem; font-weight: 750; letter-spacing: 0; }
+        .level, .status { display: inline-block; margin-top: 10px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; font-weight: 850; font-size: .8rem; }
+        .level.low { color: var(--green); background: #15372c; }
+        .level.medium { color: var(--amber); background: #352b1d; border-color: #685532; }
+        .level.high { color: var(--red); background: #3d202a; border-color: #77404c; }
+        .level.insufficient_data, .status { color: var(--muted); background: #1b2b3e; }
+        .progress-track { height: 11px; margin: 16px 0 8px; overflow: hidden; border-radius: 999px; background: #26374b; }
+        .progress-fill { height: 100%; width: 0; border-radius: 999px; background: var(--mint); }
+        .score-note { font-size: .88rem; color: var(--muted); }
+        .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+        .component-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+        .component { border: 1px solid #ffffff18; border-radius: 13px; padding: 15px; background: #07152280; min-width: 0; }
+        .component-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+        .component-points { font-size: 1.15rem; font-weight: 900; white-space: nowrap; }
+        .status { display: inline-block; padding: 4px 9px; border-radius: 8px; font-size: .74rem; font-weight: 850; text-transform: uppercase; letter-spacing: .02em; }
+        .metric { font-size: 1.85rem; font-weight: 900; color: var(--mint); line-height: 1.2; margin: 10px 0 3px; }
+        .submetric { color: var(--muted); font-size: .88rem; }
+        .divider { border: 0; border-top: 1px solid #ffffff17; margin: 16px 0; }
+        .signal { padding: 13px 0; border-bottom: 1px solid #ffffff17; }
+        .signal:last-child { border-bottom: 0; padding-bottom: 0; }
+        .signal strong { display: block; }
+        .signal p { margin: 5px 0; }
+        .detail { padding-left: 20px; margin: 8px 0; }
+        .detail li { margin: 7px 0; }
+        .notice { margin: 16px 0; padding: 15px 17px; border: 1px solid #685532; border-radius: 12px; background: #2b271d; color: #ffe5b7; }
+        .alert { padding: 12px 15px; border-radius: 10px; background: #3d202a; color: #ffd8dd; margin: 12px 0; }
+        .alert.good { background: #15372c; color: #d7ffe4; }
+        .action-list { padding-left: 25px; }
+        .action-list li { margin: 10px 0; padding-left: 3px; }
+        .inline-stat { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid #ffffff12; }
+        .inline-stat:last-child { border-bottom: 0; }
+        .crime-lines p { margin: 9px 0; }
+        .area-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+        .area-card { border: 1px solid #ffffff18; border-radius: 13px; padding: 16px; background: #07152280; min-width: 0; }
+        .area-label { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #15372c; color: var(--green); font-size: .76rem; font-weight: 850; margin: 5px 0; }
+        footer { border-top: 1px solid var(--line); padding: 25px 0; color: var(--muted); font-size: .88rem; margin-top: 30px; }
+        @media (max-width: 760px) {
+            .grid, .score-panel, .component-grid, .area-grid { grid-template-columns: 1fr; }
+            .panel { padding: 18px; } main { padding-top: 26px; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav class="wrap">
+        <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+        <div class="links">
+            <a href="{{ url_for('dashboard') }}">← Dashboard</a>
+            <a href="{{ url_for('analytics') }}">Analytics</a>
+            <a class="btn" href="{{ url_for('home') }}#check">New rental check</a>
+        </div>
+    </nav>
+</header>
+
+<main class="wrap">
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert {{ 'good' if category != 'error' else '' }}" role="status">{{ message }}</div>
+    {% endfor %}
+
+    <section class="summary">
+        <div>
+            <div class="eyebrow">Saved verification</div>
+            <h1>Rental screening report</h1>
+            <p class="muted">Report #{{ saved_report.id }}{% if saved_report.created_at %} · Created {{ saved_report.created_at.strftime('%b %d, %Y at %I:%M %p') }}{% endif %}</p>
+            <p class="muted"><strong>Address entered:</strong> {{ saved_report.address }}</p>
+        </div>
+        <span class="status">Saved report</span>
+    </section>
+
+    {% if report_data %}
+        {% set score = report_data.get('risk_score') %}
+        {% set risk_level = report_data.get('risk_level', 'low') %}
+        <section class="panel score-panel" aria-labelledby="score-title">
+            <div>
+                <div class="eyebrow">Four-part screening</div>
+                <h2 id="score-title">Overall Rental Concern Score</h2>
+                {% if score is not none %}
+                    <div class="score-number"><span>{{ score }}</span><span>/100</span></div>
+                    <span class="level {{ risk_level|lower }}">{{ report_data.get('risk_level_label', 'Score level unavailable') }}</span>
+                    <div class="progress-track" role="progressbar" aria-label="Overall Rental Concern Score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ score }}">
+                        <div class="progress-fill" data-progress-value="{{ [0, [score|int, 100]|min]|max }}"></div>
+                    </div>
+                {% else %}
+                    <p class="muted">Score unavailable.</p>
+                {% endif %}
+                <p class="score-note">{{ report_data.get('explanation', '') }}</p>
+                {% if report_data.get('assessment_completeness') == 'partial' %}
+                    <p class="notice">Partial assessment: {{ report_data.get('checks_completed', 0) }} of 4 checks completed. Any unchecked component adds no points, so the score may understate concern.</p>
+                {% endif %}
+            </div>
+            <div>
+                <h3>How the score was calculated</h3>
+                <p class="muted">Each check contributes up to 25 points. The score is a preliminary concern indicator, not proof of fraud.</p>
+                <div class="component-grid">
+                    {% for component in report_data.get('score_component_details', []) %}
+                        <div class="component">
+                            <div class="component-top">
+                                <strong>{{ component.get('label', 'Check') }}</strong>
+                                <span class="component-points">{{ component.get('points', 0) }}/25</span>
+                            </div>
+                            <span class="status">{{ component.get('status', 'Unknown') }}</span>
+                            <p>{{ component.get('explanation', '') }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        
+
+        {% set alternatives = report_data.get('alternative_areas') or {} %}
+        {% if alternatives.get('areas') %}
+            <section class="panel" style="margin-top: 16px">
+                <h2>Nearby neighbourhoods to explore</h2>
+                <p class="muted">These area suggestions were triggered by a Medium or High overall score. They are neighbourhoods to research, not confirmed available flats.</p>
+                <div class="area-grid">
+                    {% for item in alternatives.get('areas', [])[:3] %}
+                        <article class="area-card">
+                            <h3>{{ item.get('area_name', 'Neighbourhood') }}</h3>
+                            <span class="area-label">{{ item.get('relative_activity_level', 'Lower') }} relative activity</span>
+                            <p class="submetric">Approximately {{ item.get('distance_from_listing_km', '—') }} km from the entered address.</p>
+                            <p>{{ item.get('message', 'Lower median nearby incident-record count than the current neighbourhood in the available comparison period.') }}</p>
+                            <div class="inline-stat"><span>Property-address points represented</span><strong>{{ '{:,}'.format(item.get('address_points_in_dataset', 0)) }}</strong></div>
+                        </article>
+                    {% endfor %}
+                </div>
+                <p class="submetric" style="margin-top: 14px">{{ alternatives.get('message', '') }} Neighbourhood-level incident comparisons do not guarantee safety; current rent and unit availability must be checked separately.</p>
+            </section>
+        {% elif report_data.get('risk_score', 0)|int >= 25 %}
+            <section class="panel" style="margin-top: 16px">
+                <h2>Nearby neighbourhoods to explore</h2>
+                <p>{{ alternatives.get('message', 'Alternative areas could not be calculated from the available data.') }}</p>
+                <p class="submetric">The monthly rent you entered is used as the search target. The supplied datasets do not establish current unit availability or neighbourhood-specific rents.</p>
+            </section>
+        {% endif %}
+
+        <section class="panel" style="margin-top: 16px">
+            <h2>Suggested next steps</h2>
+            {% if report_data.get('recommended_actions') %}
+                <ol class="action-list">
+                    {% for action in report_data.recommended_actions %}<li>{{ action }}</li>{% endfor %}
+                </ol>
+            {% else %}
+                <p class="muted">Complete the available checks to receive tailored next steps.</p>
+            {% endif %}
+        </section>
+
+        {% if report_data.get('limitations') %}
+            <section class="panel" style="margin-top: 16px">
+                <h2>Information limitations</h2>
+                <ul class="detail">{% for item in report_data.limitations %}<li>{{ item }}</li>{% endfor %}</ul>
+            </section>
+        {% endif %}
+
+        <section class="panel" style="margin-top: 16px">
+            <h2>Download your report</h2>
+            <p class="muted">Keep a copy of the screening results for your records.</p>
+            <div class="actions">
+                <a class="btn" href="{{ url_for('download_report_pdf', report_id=saved_report.id) }}">Download PDF report</a>
+                <a class="btn ghost" href="{{ url_for('download_report_json', report_id=saved_report.id) }}">Download JSON data</a>
+            </div>
+        </section>
+    {% else %}
+        <section class="panel">
+            <h2>Report data unavailable</h2>
+            <p class="muted">The saved report could not be displayed. Its stored data may be empty or in an unexpected format. Your report record has not been deleted.</p>
+        </section>
+    {% endif %}
+
+    <div class="actions" style="margin-top: 20px">
+        <a class="btn" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+        <a class="btn ghost" href="{{ url_for('home') }}#check">Check another rental</a>
+    </div>
+</main>
+
+<footer>
+    <div class="wrap">
+        <a class="brand" href="{{ url_for('home') }}">◈ Rental<span>Shield</span></a>
+        <p>Preliminary rental screening, not a legal or safety guarantee. Verify important claims independently before paying money or signing a lease.</p>
+        © RentalShield
+    </div>
+</footer>
+<script>
+    // Keep Jinja expressions out of CSS so editor CSS validators do not flag them.
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".progress-fill[data-progress-value]").forEach(function (bar) {
+            var parsed = Number(bar.dataset.progressValue);
+            var bounded = Number.isFinite(parsed) ? Math.max(0, Math.min(100, parsed)) : 0;
+            bar.style.width = bounded + "%";
+        });
+    });
+</script>
+</body>
+</html>
